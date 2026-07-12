@@ -1,0 +1,31 @@
+  Gameplay:
+  - CPU countries can attack each other (vast majority should be rivals attacking each other); it should show a different countdown screen than the red one (amber screen?) where the target is clearly stated as not this country; player has the choice to intervene with conventional arms (which risk escalation esp. by regimes with bad NC3 or low NC3 control) or nuclear (same armageddon endgame) or to do nothing, which leaves the decision up to the victim country. They should decide to stand down almost always - based on historical close calls - and there should be a "hero text" describing a hero, using a real name
+  - Balance: I've got max NC3 modernization but my radar still shows the same (wrong >50%) confidence level even after I deliberate. This shouldn't be the case.
+  - Launch response: I should be able to launch interceptors if I've developed them above a certain level; either it stops a nuke (causing UNSC action against the aggressor) or hits the decoy from the false alarm text in a humorous fashion (e.g., all of earth watched as the moon left behind some dust from your incerceptor strike)
+  - UNSC meetings should be a real screen. Dr. Zhivago roundtable vibes.
+  - Israel should be able to expand markets, but it costs more
+  - Defection should cost money; more money the higher the treaty level is (there are inspections).
+  - I should be able to choose to re-play a seed
+  - AI market expansion cost should go up each time it's purchased
+  - Customers should be measured in billions (8 billion, not 8 customers); max out at world population; decimals possible.
+  - I should be able to expand interceptors up to 100%, also at increasing cost; missile development breakthroughs by hostile regimes should decrease my interception % and allow me to buy more again if it was maxed out
+  - We should simulate chips being harder to acquire if you lose legitimacy/invest too much in the military
+
+  Design:
+  - Assignment screen shows world map; window, delib, and surv are hidden in hover tooltips instead
+  - Normal gameplay screen also shows world map; POSTURE, WATCH LOG, and THE BOARD all move down below it. Notable events (e.g., countries implementing AI into NC3, countries attacking each other) get colored differently or otherwise highlighted; user hovers or uses arrowkeys to change focus between countries for more detailed information (expose budget, arsenal etc. but Israel's, NK's arsenal is still secret/has an error margin)
+  - Arsenal size, AI-integration, having been hit by nukes should all be visually reflected on the map; what else?
+  - Un-dim POSTURE, WATCH LOG, and THE BOARD titles, and WATCH LOG contents from this year
+  - Move NC3 definition into a hover tooltip. Define all of the POSTURE text with tooltips.
+  - Hover tooltip is inverted colors (amber background) instead of current (blue background with white text)
+  - Add more newlines in hover tooltips, e.g., last 1-2 sentences on each action in the action bar (+x always stays on the first line; consequence on second line e.g., "BUYS NO WARHEADS. NO ONE WILL THANK YOU."
+  - Check the whole UI for unnecessary word wrap - such as "THE CAUSE:" text
+  - in THE REPORT, Don't say "real?" change it to say "nuke?" with possible values false alarm or a nuke model from the relevant country (we can make some up based on e.g., birds of prey from each country)
+  - Israel arsenal should just be a "?" or for the US, "What arsenal?"; this should only appear on the globe view, not under THE BOARD
+  - Israel text "THEY DO NOT KNOW THIS" - change to "COVERT".
+  - Israel text "FEWER INDICATIONS" append "DUE TO LESS TRIGGER-HAPPY TEENAGERS AT COMMAND." No need to mention the legitimacy point; that's self-evident.
+  - Countries without geese etc. should have localized versions of the text. NK should have false alarms set off by SK propaganda planes.
+  - Both Human Control % and Budget should be shown on the END OF WATCH screen
+  - Make the END OF WATCH screen more tabular; right now, the tables are kind of random shapes and sizes; you can stretch them out to make them look better in a grid
+  - Action - standdown in THE RECORD should be more fun text with real examples or standard phrases (e.g., the training worked)
+  - Next to "report for another shift" there should be a "Share score" button that allows sharing of a humorous text describing game result (e.g., "I played the most boring strategy and saved the world on Stone Age in 72!" with score summary numbers and a link to the site

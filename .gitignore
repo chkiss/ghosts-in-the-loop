@@ -1,0 +1,14 @@
+node_modules/
+dist/
+*.log
+.deploy.log
+# Local-only deploy/host files (live box, not the public repo)
+deploy.sh
+nginx-nukes.conf.snippet
+.env
+# Python caches
+__pycache__/
+*.pyc
+
+# Local-only playtest telemetry (gitignored; loads optionally at runtime)
+src/ui/telemetry.ts

@@ -1,0 +1,1005 @@
+/* GHOSTS IN THE LOOP — amber P3 terminal, landscape. Three colors, no more. (SPEC §11) */
+
+:root {
+  --amber: #ffb000;
+  --amber-dim: #b07c10;
+  --bg: #0a0705;
+  --green: #33ff33;   /* treaty screens only — unused in M2, reserved */
+  --red: #b00000;          /* the alert screen's phosphor inversion */
+  --hot: #ff3a30;          /* bright red for marks that must read against amber */
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html, body, #root { height: 100%; }
+
+body {
+  background: #000;
+  color: var(--amber);
+  font-family: 'Berkeley Mono', 'IBM Plex Mono', ui-monospace, 'Cascadia Mono', 'JetBrains Mono', Menlo, monospace;
+  font-size: clamp(12px, 1.35vw, 16px);
+  line-height: 1.4;
+  -webkit-font-smoothing: none;
+  overflow: hidden;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* ——— the terminal in its bezel: 4:3-ish, centered, landscape ——— */
+
+/* the faux-terminal bezel: a plastic frame around the screen. It also expands
+   the usable area — the screen no longer clips, so tooltips spill into the frame
+   instead of running off the viewport. */
+/* wide black side-panels, like the plastic sides of an old CRT monitor. They
+   pad the viewport so tooltips have somewhere to go instead of off the edge. */
+.bezel {
+  position: fixed;
+  inset: 0;
+  height: 100dvh;
+  background: #000;
+  padding: 14px clamp(64px, 11vw, 240px);
+  overflow: hidden;
+  display: flex;
+}
+
+.crt {
+  position: relative;
+  height: 100%;
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+  background: var(--bg);
+  padding: max(12px, env(safe-area-inset-top)) 26px max(12px, env(safe-area-inset-bottom));
+  display: flex;
+  flex-direction: column;
+  overflow: visible;
+  border: 1px solid #3a2a12;
+  border-radius: 6px;
+  box-shadow: 0 0 0 3px #0a0705, 0 0 30px rgba(0, 0, 0, 0.7);
+}
+
+/* active-service emblem, filling most of the top-left panel */
+.bezel-logo {
+  position: absolute;
+  top: 18px;
+  left: 6px;
+  width: clamp(58px, 10vw, 210px);
+  height: clamp(58px, 10vw, 210px);
+  image-rendering: pixelated;
+  opacity: 0.8;
+  filter: drop-shadow(0 0 6px rgba(255, 176, 0, 0.4));
+  z-index: 12;
+  pointer-events: none;
+}
+/* a slightly-askew wall calendar filling the top-right panel */
+.bezel-cal {
+  position: absolute;
+  top: 22px;
+  right: 6px;
+  width: clamp(56px, 9.5vw, 195px);
+  transform: rotate(3.5deg);
+  background: #0c0906;
+  border: 2px solid var(--amber-dim);
+  text-align: center;
+  z-index: 12;
+  pointer-events: none;
+  box-shadow: 3px 4px 10px rgba(0, 0, 0, 0.7);
+}
+.cal-rings { font-size: clamp(0.6em, 1.4vw, 1.1em); color: var(--amber-dim); letter-spacing: 4px; border-bottom: 1px solid var(--amber-dim); padding-top: 2px; }
+.cal-year { font-size: clamp(1.3em, 4vw, 3.4em); color: var(--amber); padding: 6px 0 2px; letter-spacing: 2px; }
+.cal-end { font-size: clamp(0.5em, 1.15vw, 0.9em); color: var(--amber-dim); letter-spacing: 1px; padding-bottom: 6px; }
+/* a handwritten square sticky note on the right panel: one size, one shape,
+   one tilt, one curl for everyone — the text is a pre-baked PNG. Exception:
+   the North Korean note hangs perfectly straight (.straight), obligatorily. */
+.bezel-note {
+  position: absolute;
+  right: 6px;
+  top: 44%;
+  width: clamp(84px, 10.5vw, 200px);
+  aspect-ratio: 1;
+  /* the top ~25% lies flat under the (invisible) adhesive band; below it the
+     paper angles faintly off the panel — a whisper of caught light at the
+     fold, then the corner curl. No shadow at the fold itself. */
+  background:
+    linear-gradient(180deg,
+      rgba(0, 0, 0, 0) 25%,
+      rgba(255, 244, 200, 0.14) 30%,
+      rgba(0, 0, 0, 0) 46%),
+    linear-gradient(160deg, var(--amber) 82%, #d99500 96%, #a87300 100%);
+  transform: rotate(-6deg);
+  border-bottom-right-radius: 50% 10%; /* the corner lifts off the panel */
+  box-shadow: 2px 3px 5px rgba(0, 0, 0, 0.6);
+  /* above the overlays (z 20): the paper is stuck to the glass, so its lifted
+     corner stays over the field manual and the walk-out prompt, not under. */
+  z-index: 25;
+  pointer-events: none;
+}
+.bezel-note.straight { transform: none; }
+.bezel-note img { width: 100%; height: 100%; display: block; }
+.bezel-note::after {
+  /* a slim shadow hugging the lifted corner, not a detached blob */
+  content: '';
+  position: absolute;
+  right: 8%;
+  bottom: -2px;
+  width: 36%;
+  height: 8px;
+  background: rgba(0, 0, 0, 0.45);
+  filter: blur(3px);
+  transform: skewX(25deg);
+  z-index: -1;
+}
+
+/* scanlines + vignette */
+.crt::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    repeating-linear-gradient(to bottom, rgba(0,0,0,0) 0 2px, rgba(0,0,0,0.22) 2px 3px),
+    radial-gradient(ellipse at center, rgba(0,0,0,0) 58%, rgba(0,0,0,0.5) 100%);
+  z-index: 10;
+}
+
+/* faint amber bleed */
+.crt::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  box-shadow: inset 0 0 90px rgba(255, 176, 0, 0.07);
+  z-index: 9;
+}
+
+.screen {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  /* visible (not auto) so action-bar tooltips can spill into the bezel side
+     panels instead of triggering a horizontal scrollbar on the screen */
+  overflow: visible;
+  white-space: pre-wrap;
+  min-height: 0;
+}
+/* the long end-of-watch screens opt into vertical scrolling; they carry no
+   overflowing tooltips, so this can't reintroduce the horizontal scrollbar */
+.screen.scrolly { overflow-y: auto; }
+
+.dim { color: var(--amber-dim); }
+.green { color: var(--green); } /* treaty & verification screens only (SPEC §11) */
+.redtext { color: var(--hot); }
+.glow { text-shadow: 0 0 6px rgba(255, 176, 0, 0.55); }
+.footnote { font-size: 0.8em; margin-top: 6px; }
+
+pre { font-family: inherit; white-space: pre-wrap; }
+
+/* ——— red alert: phosphor inversion. Nothing else ever inverts. ——— */
+
+.crt.red {
+  background: var(--red);
+  color: #000;
+  animation: strobe 0.5s steps(1) infinite;
+}
+.crt.red .dim { color: #2a0000; }
+.crt.red .glow { text-shadow: none; }
+.crt.red::before { box-shadow: inset 0 0 90px rgba(0, 0, 0, 0.35); }
+
+@keyframes strobe {
+  0%   { background: var(--red); }
+  50%  { background: #8c0000; }
+}
+
+/* single blinking character for INDICATION */
+.blink { animation: blink 1s steps(1) infinite; }
+@keyframes blink { 50% { opacity: 0; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .crt.red { animation: none; background: var(--red); }
+  .blink { animation: none; }
+}
+
+/* ——— three-panel strategic layout ——— */
+
+.hdr {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  letter-spacing: 0.05em;
+  border-bottom: 1px solid var(--amber-dim);
+  padding-bottom: 4px;
+  /* tuned so the board's top edge lands at the same offset as on the station-
+     select screen (banner + its margin), since the .hdr runs taller (year clock) */
+  margin-bottom: 5px;
+}
+/* the clock the whole game runs on: players kept missing that it stops in 2045 */
+.hdryear { font-size: 1.35em; letter-spacing: 0.12em; }
+.hdryear .dim { font-size: 0.72em; }
+
+.cols {
+  display: flex;
+  gap: 20px;
+  flex: 1;
+  min-height: 0;
+}
+.col { flex: 1; min-width: 0; overflow: visible; }
+.col.wide { flex: 1.6; }
+.coltitle {
+  color: var(--amber);
+  border-bottom: 1px solid var(--amber-dim);
+  margin-bottom: 6px;
+  letter-spacing: 0.15em;
+}
+
+/* the control panel along the bottom: a centered title splitting its rule,
+   then four quiet domain columns + END YEAR. Buttons are calm (no border)
+   until hovered; costs sit dim on the right. */
+.panelhdr {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--amber);
+  letter-spacing: 0.25em;
+  margin-top: 8px;
+}
+.panelhdr::before, .panelhdr::after {
+  content: '';
+  height: 1px;
+  background: var(--amber-dim);
+  flex: 1;
+}
+.actionbar {
+  display: flex;
+  gap: 16px;
+  align-items: stretch;
+  padding-top: 6px;
+}
+.agroup { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px; }
+.agrouptitle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--amber-dim);
+  font-size: 0.72em;
+  letter-spacing: 0.25em;
+  margin-bottom: 2px;
+  white-space: nowrap;
+}
+.agrouptitle::before, .agrouptitle::after {
+  content: '';
+  height: 1px;
+  background: var(--amber-dim);
+  opacity: 0.6;
+  flex: 1;
+}
+button.act {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 6px;
+  border-color: transparent;
+  padding: 2px 8px;
+  font-size: 0.95em;
+  text-align: left;
+  white-space: nowrap;
+  /* no overflow:hidden here — it would clip the ::after tooltip */
+}
+button.act span:first-child { overflow: hidden; text-overflow: ellipsis; }
+button.act .cost { flex: 0 0 auto; }
+button.act:hover:not(:disabled):not(.inert) { border-color: var(--amber); }
+button.act:disabled, button.act.inert { border-color: transparent; }
+button.act .cost { color: var(--amber-dim); }
+button.act:disabled .cost, button.act.inert .cost { color: #59400d; }
+button.act:active .cost { color: var(--bg); }
+.endcell { display: flex; align-items: stretch; }
+button.act .keyhint { color: var(--amber-dim); opacity: 0; } /* appears when the column is armed */
+.agroup.armed button.act .keyhint { opacity: 1; }
+button.act:disabled .keyhint, button.act.inert .keyhint { color: #59400d; }
+.agrouptitle u { text-decoration: underline; text-underline-offset: 2px; }
+.agrouptitle.armed { color: var(--amber); }
+.agrouptitle.armed::before, .agrouptitle.armed::after { background: var(--amber); opacity: 1; }
+
+button {
+  font: inherit;
+  background: transparent;
+  color: var(--amber);
+  border: 1px solid var(--amber);
+  padding: 8px 12px;
+  text-align: center;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+}
+button:active { background: var(--amber); color: var(--bg); }
+button:disabled, button.inert { color: #59400d; border-color: #59400d; cursor: default; }
+button.sel { background: var(--amber); color: var(--bg); }
+
+button.endyear {
+  border-width: 2px;
+  font-weight: bold;
+  padding: 6px 14px;
+  font-size: 0.9em;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+button.endyear .tri { font-size: 3.2em; line-height: 1; }
+
+/* faction cards: 3×3 grid */
+.factiongrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+.fcard { text-align: left; white-space: pre-wrap; font-size: 0.85em; padding: 8px 10px; }
+
+.optrow { display: flex; flex-direction: column; gap: 8px; margin: 8px 0; }
+.optrow.row { flex-direction: row; }
+.optrow.row button { flex: 1; }
+
+.banner {
+  text-align: center;
+  border-top: 1px solid var(--amber-dim);
+  border-bottom: 1px solid var(--amber-dim);
+  padding: 2px 0;
+  margin-bottom: 12px;
+  letter-spacing: 0.25em;
+}
+
+/* ——— the warning modal: info left, clock right, three switches below ——— */
+
+.warning-grid {
+  display: flex;
+  gap: 30px;
+  align-items: center;
+  flex: 1;
+}
+.warning-grid > pre { flex: 1.4; font-size: 1.3em; line-height: 1.4; }
+
+.bigclock {
+  flex: 1;
+  font-size: 4.2em;
+  text-align: center;
+  letter-spacing: 0.1em;
+}
+
+/* the redesigned warning: track line up top, two hero numbers (how sure vs
+   how long), switches with consequence captions beneath */
+.trackline { text-align: center; font-size: 1.6em; letter-spacing: 0.06em; margin-top: 6px; }
+.heroblock { flex: 1; text-align: center; }
+.herolabel { font-size: 1.05em; letter-spacing: 0.3em; opacity: 0.75; }
+.heronum { font-size: 5.6em; letter-spacing: 0.08em; line-height: 1.12; }
+.repolls { font-size: 1.15em; letter-spacing: 0.1em; opacity: 0.75; }
+.warnacts { align-items: stretch; }
+/* start each switch's stack at the top so the buttons align in a row and the
+   captions hang beneath — the button height must not depend on caption length */
+.warnacts .wact { flex: 1; display: flex; flex-direction: column; gap: 5px; justify-content: flex-start; }
+/* fixed height + single-line centered label: every switch is identical, and the
+   label stays inline flow (NOT flex — flex would split "<u>I</u>NTERCEPT" into
+   two items and misalign the underlined access key). The `.actions` qualifier
+   outranks `.actions.row button { flex: 1 }` (line ~422), which would otherwise
+   make each button grow to fill its cell — taller where the caption is short. */
+.actions.warnacts .wact button { width: 100%; padding: 0 10px; font-size: 1.2em; flex: 0 0 auto; height: 3.4em; line-height: 3.4em; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.warnacts button.danger { border-width: 3px; font-weight: bold; }
+.wcap { font-size: 0.95em; text-align: center; letter-spacing: 0.05em; opacity: 0.65; }
+.wcap .oknum { color: var(--green); }
+.wcap .badnum { font-weight: bold; text-decoration: underline; }
+.crt.red .wcap .oknum { color: #003300; }
+.cmdvoice { text-align: center; margin-top: 10px; font-size: 1.4em; }
+
+/* end-of-watch diagnostics: collapsed by default so the reading + next-shift
+   buttons sit above the fold. The summary reads as a section header. */
+.diagnostics { margin: 4px 0 12px; }
+.diagnostics > summary {
+  cursor: pointer;
+  list-style: none;
+  letter-spacing: 0.18em;
+  padding: 6px 0;
+  border-top: 1px solid var(--amber-dim);
+  border-bottom: 1px solid var(--amber-dim);
+  color: var(--amber-dim);
+  user-select: none;
+}
+.diagnostics > summary::-webkit-details-marker { display: none; }
+.diagnostics > summary::before { content: '▸ '; }
+.diagnostics[open] > summary::before { content: '▾ '; }
+.diagnostics[open] > summary { margin-bottom: 12px; }
+/* THE HEROES opener, under the badges shelf: a quiet clickable line. */
+.herolink {
+  cursor: pointer;
+  letter-spacing: 0.18em;
+  padding: 6px 0;
+  margin: 4px 0 12px;
+  text-align: center;
+  color: var(--amber-dim);
+  user-select: none;
+}
+.herolink::after { content: ' ▸'; }
+.replayimg {
+  display: block;
+  margin: 8px auto;
+  width: 100%;
+  max-height: 74vh;
+  object-fit: contain;
+  image-rendering: pixelated; /* scale the frames up crisp, like the CRT it is */
+  border: 1px solid var(--amber-dim);
+}
+
+.actions {
+  margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding-top: 14px;
+}
+.actions.row { flex-direction: row; }
+.actions.row button { flex: 1; padding: 16px 12px; }
+.actions.narrow { max-width: 480px; width: 100%; align-self: center; margin-inline: auto; }
+
+/* the boot screen carries one button; give it the weight of a switch */
+.boottitle { font-size: 2.1em; letter-spacing: 0.06em; }
+.bootnote { font-size: 1.15em; line-height: 1.5; }
+.actions.boot button { font-size: 1.5em; padding: 14px 0; letter-spacing: 0.14em; }
+
+.crt.red button {
+  color: #000;
+  border-color: #000;
+  background: transparent;
+}
+.crt.red button:active { background: #000; color: var(--red); }
+.crt.red button:disabled { color: #2a0000; border-color: #2a0000; }
+
+.seal { text-align: center; margin: 18px 0; }
+
+/* dithered amber art assets — already 1-bit amber-on-transparent */
+.art { display: block; image-rendering: pixelated; filter: drop-shadow(0 0 6px rgba(255, 176, 0, 0.4)); }
+/* the emblem is 512px wide and 1-bit: shown at 360 it was resampled to a
+   fractional scale, and `pixelated` turned that into visible grain. At its
+   native width every source pixel lands on a screen pixel. */
+.artboot { width: min(512px, 88%); margin: 2.4vh auto; }
+.artseal { width: 120px; height: 120px; flex: 0 0 120px; }
+.artend { width: min(520px, 90%); margin: 10px auto; }
+.artunsc { width: min(560px, 92%); margin: 8px auto; }
+.briefhdr { display: flex; gap: 16px; align-items: flex-start; }
+.briefhdr > div { flex: 1; min-width: 0; }
+/* the economy / government / trait lines are each a <pre>; the browser default
+   of margin:1em stacks ~150px of dead space between them. Collapse to a tight,
+   uniform gap so the full trait list (China/US carry the most) fits the CRT. */
+.briefhdr > div { display: flex; flex-direction: column; gap: 2px; }
+.briefhdr pre { margin: 0; line-height: 1.3; font-size: 0.92em; }
+
+.rule { border-top: 1px solid var(--amber-dim); margin: 14px 0; }
+
+/* the scenario beat before END OF WATCH */
+.screen.scenario { justify-content: center; align-items: center; text-align: center; }
+/* the centered column shrinks children to content width; stretch the banner back
+   out so its framing lines run the full width of the screen */
+.screen.scenario > .banner { align-self: stretch; width: 100%; }
+.scenariotitle { font-size: 1.35em; margin: 3vh 0; text-align: center; white-space: pre-wrap; }
+.scenariocause { max-width: 660px; text-align: center; letter-spacing: 0.03em; }
+
+/* ——— the board: WOPR vector map ——— */
+
+.mapwrap { width: 100%; }
+.worldmap {
+  display: block;
+  width: 100%;
+  max-height: 31vh;
+  margin: 0 auto;
+}
+.worldmap .coast {
+  fill: none;
+  stroke: var(--amber-dim);
+  stroke-width: 0.6;
+  filter: drop-shadow(0 0 1.2px rgba(255, 176, 0, 0.6));
+}
+.worldmap .blip { cursor: pointer; }
+.worldmap .hit { fill: transparent; pointer-events: all; }
+.worldmap .dot {
+  fill: var(--amber);
+  filter: drop-shadow(0 0 1px rgba(255, 176, 0, 0.8));
+}
+.worldmap .blip.ai .dot { fill: var(--amber); filter: drop-shadow(0 0 2px rgba(255, 176, 0, 0.95)); }
+/* seized by the ASI ("HAL"): red and pulsing — it answers something else */
+.worldmap .blip.held .dot { fill: var(--hot); filter: drop-shadow(0 0 4px rgba(255, 58, 48, 0.9)); animation: blink 1s steps(1) infinite; }
+.worldmap .blip.held .bliplabel { fill: var(--hot); }
+.worldmap .blip.held .focusring { stroke: var(--hot); }
+/* placed under UN custody: green, and out of the game */
+.worldmap .blip.unseized .dot { fill: var(--green); filter: drop-shadow(0 0 3px rgba(51, 255, 51, 0.8)); }
+.worldmap .blip.unseized .bliplabel { fill: var(--green); }
+.worldmap .bliplabel {
+  fill: var(--amber);
+  font-size: 6px;
+  font-family: inherit;
+  letter-spacing: 0.05em;
+}
+/* a struck country loses a jigsaw piece of coastline, punched in the bg colour */
+.worldmap .notch { fill: var(--bg); stroke: none; }
+/* faint zebra hatch over the rough spot of a struck city */
+.worldmap .zebrabar { fill: var(--amber-dim); }
+.worldmap .zebra { opacity: 0.5; pointer-events: none; }
+.worldmap .blip.minor .dot { fill: var(--amber); filter: drop-shadow(0 0 2px rgba(255,176,0,0.9)); }
+.worldmap .blip.minor .bliplabel { font-size: 5px; }
+.worldmap .focusring {
+  fill: none;
+  stroke: var(--amber);
+  stroke-width: 0.6;
+}
+.mapdetail {
+  border-top: 1px solid var(--amber-dim);
+  border-bottom: 1px solid var(--amber-dim);
+  padding: 4px 0;
+  margin-bottom: 8px;
+  min-height: 1.8em;
+}
+/* one line, clipped (no browser scrollbar); a click drives a ticker sweep */
+.mapdetail .detailclip { overflow: hidden; white-space: nowrap; font-size: 0.95em; cursor: pointer; }
+.mapdetail .detailline { display: inline-block; white-space: nowrap; will-change: transform; }
+
+/* ——— hover tooltips: phosphor inversion, amber card ——— */
+
+[data-tip] { position: relative; }
+[data-tip]:hover::after {
+  content: attr(data-tip);
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 0;
+  background: var(--amber);
+  color: var(--bg);
+  padding: 7px 10px;
+  white-space: pre-line;
+  width: max-content;
+  max-width: 340px;
+  z-index: 30;
+  font-size: 0.85em;
+  letter-spacing: 0.02em;
+  text-align: left;
+  pointer-events: none;
+  box-shadow: 0 0 10px rgba(255, 176, 0, 0.4);
+}
+/* action-bar tips: center over the key and clamp to the viewport so a
+   right-hand button (e.g. FUND ASSURANCE) can't run off the bezel edge */
+.actionbar [data-tip]:hover::after {
+  bottom: calc(100% + 4px);
+  left: 50%;
+  right: auto;
+  transform: translateX(-50%);
+  max-width: min(300px, 70vw);
+}
+/* group-title tips anchor left so the first column's can't run off-screen */
+.agrouptitle [data-tip]:hover::after { left: 0; transform: none; }
+/* a greyed button's tooltip is an excuse, not an offer — it dims to match */
+button:disabled[data-tip]:hover::after, button.inert[data-tip]:hover::after {
+  background: var(--amber-dim);
+  color: var(--bg);
+  box-shadow: none;
+  opacity: 0.88;
+}
+
+/* posture stat rows */
+.stat {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+}
+.stat > span { white-space: nowrap; }
+.stat > span:first-child { color: var(--amber-dim); }
+.stat[data-tip] { cursor: help; }
+.stat > span:first-child:hover { color: var(--amber); }
+
+/* watch log: this year bright, history dim, events loud.
+   The log column clips and scrolls; it never bleeds into the action bar. */
+.col.logcol { overflow: hidden; display: flex; flex-direction: column; }
+.watchlog { overflow-y: auto; flex: 1; min-height: 0; }
+.logline { color: var(--amber-dim); }
+.logline.now { color: var(--amber); }
+.logline.notable { color: var(--amber); text-shadow: 0 0 5px rgba(255, 176, 0, 0.45); }
+.logline.attack {
+  background: var(--amber);
+  color: var(--bg);
+  padding: 0 3px;
+  margin: 1px 0;
+}
+
+.namebtn { flex: 1; padding: 6px 4px; font-size: 0.85em; }
+
+/* one-shot announcement screens ("press releases"): a headline and a short body
+   on a wide glass. Center the stack vertically and scale the type up so they
+   fill the screen instead of huddling at the top — no extra words needed. */
+/* `safe center` centers when the copy fits and falls back to top-aligned when
+   it doesn't, so a long bulletin scrolls (overflow-y: auto) instead of clipping
+   its own top or crowding the buttons. */
+/* the ALERT blip and the interception-result outcomes read at a larger size */
+.screen.bigtext > pre { font-size: 1.4em; line-height: 1.5; }
+/* UN Security Council resolution body — matched to the interception-result
+   family so the chamber reads at the same weight as the strike screens */
+.unscbody { font-size: 1.4em; line-height: 1.5; max-width: 74ch; width: 100%; margin-inline: auto; overflow-wrap: break-word; }
+
+.screen.bulletin { justify-content: safe center; align-items: center; gap: 4px; overflow-y: auto; }
+/* title + dateline: bigger, and their framing rules run the full screen width */
+.screen.bulletin > .banner { width: 100%; font-size: 1.6em; }
+.screen.bulletin > pre.newswire { width: 100%; font-size: 1.2em; letter-spacing: 0.16em; text-align: center; }
+/* body: full width and LEFT-aligned, so the teletype types from the left edge
+   (cursor advancing) instead of growing out from the centre, and long lines wrap
+   cleanly against a straight left margin instead of raggedly on both sides */
+.screen.bulletin > pre {
+  font-size: 1.4em;
+  line-height: 1.55;
+  text-align: left;
+  width: 100%;
+}
+.screen.bulletin > pre.glow { font-size: 1.45em; }
+.screen.bulletin > .actions { margin-top: 34px; width: 100%; max-width: 660px; }
+
+/* newswire dateline on crisis cards */
+.newswire {
+  letter-spacing: 0.12em;
+  font-size: 0.8em;
+  border-top: 1px solid var(--amber-dim);
+  border-bottom: 1px solid var(--amber-dim);
+  padding: 3px 0;
+}
+
+/* the assignment stat block: two intentional lines, each held on one line,
+   scrolling horizontally rather than wrapping mid-figure on a narrow screen */
+.statblock { overflow-x: auto; flex: 0 0 auto; }
+.statblock .line { white-space: nowrap; }
+/* briefing stat grid: label over value, four to a row */
+.statgrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px 18px;
+  flex: 0 0 auto;
+}
+.screen.briefing .statgrid { gap: 2px 18px; margin-top: 4px !important; }
+.screen.briefing .statgrid .sdef { line-height: 1.25; }
+.statgrid .slabel { color: var(--amber-dim); font-size: 0.68em; letter-spacing: 0.2em; }
+.statgrid .sval { font-size: 1.05em; }
+/* the definition, printed under the number — this is where the player learns
+   the vocabulary the rest of the game assumes */
+.statgrid .sdef {
+  color: var(--amber-dim);
+  font-size: 0.62em;
+  line-height: 1.35;
+  letter-spacing: 0.02em;
+  white-space: pre-line;
+  margin-top: 2px;
+}
+
+/* the custom-seed field on the briefing */
+.seedfield {
+  font: inherit;
+  background: transparent;
+  color: var(--amber);
+  border: 1px solid var(--amber-dim);
+  padding: 4px 8px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  width: 12em;
+}
+.seedfield:focus { outline: none; border-color: var(--amber); }
+
+/* the clock-speed + seed block, pushed to the bottom as a distinct selection */
+/* Safety net: the heaviest stations (US/RU/NK) carry more briefing than a short
+   laptop can show at once. Compaction fits the common 1366×768 case; on anything
+   shorter the screen scrolls so the BEGIN button is never stranded off-screen. */
+.screen.briefing { overflow-y: auto; }
+.briefbottom { margin-top: auto; }
+.screen.briefing .rule { margin: 8px 0; }
+.briefbottom .dim { margin: 6px 0 4px; letter-spacing: 0.12em; }
+.speedgrid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.seedgrid { display: grid; grid-template-columns: 2fr 1fr; gap: 8px; margin-top: 8px; }
+.speedgrid button, .seedgrid button { width: 100%; text-align: center; }
+.seedgrid .seedfield { width: 100%; text-align: center; }
+.seedwrap { display: block; }
+.reportbtn { width: 100%; margin-top: 8px; border-width: 2px; font-weight: bold; }
+
+/* END OF WATCH grid: uniform stretched tables.
+   Size to content (not flex:1) so a tall RECORD table can't overflow its column
+   and spill over ASSIGNED READING — the whole .screen scrolls instead. */
+.cols.endgrid { flex: none; min-height: 0; align-items: start; }
+.endgrid .col { display: flex; flex-direction: column; min-width: 0; }
+/* fixed layout + wrapping cells: long attacker/action strings wrap inside their
+   column instead of forcing the table wide and colliding with ASSIGNED READING */
+table.debrief.stretch { width: 100%; table-layout: fixed; }
+
+table.debrief { border-collapse: collapse; margin: 8px 0; }
+table.debrief td, table.debrief th {
+  border: 1px solid var(--amber-dim);
+  padding: 3px 10px;
+  text-align: left;
+  font-size: 0.85em;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  white-space: normal;
+  vertical-align: top;
+}
+/* THE RECORD: give the wide text columns room, keep the numeric ones tight */
+table.debrief.record col.c-year { width: 12%; }
+table.debrief.record col.c-shown, table.debrief.record col.c-true { width: 11%; }
+table.debrief.record col.c-nuke { width: 34%; }
+table.debrief.record col.c-action { width: 32%; }
+.assigned-reading { margin-top: 12px; clear: both; }
+
+
+/* ——— settings gear, overlays, effects-off ——— */
+.crt.fxoff::after, .crt.fxoff::before { display: none; }
+
+.gearbtn {
+  position: absolute;
+  top: 2px;
+  right: 4px;
+  z-index: 12;
+  background: none;
+  border: none;
+  padding: 2px 6px;
+  color: var(--amber-dim);
+  font-size: 2.4em;
+  line-height: 1;
+  cursor: pointer;
+  opacity: 0.55;
+}
+.gearbtn:hover { opacity: 1; color: var(--amber); }
+
+.overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  background: rgba(10, 7, 5, 0.82);
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  overflow-y: auto;
+  padding: 4vh 12px;
+}
+.overlaypanel {
+  background: var(--bg);
+  border: 1px solid var(--amber-dim);
+  box-shadow: 0 0 40px rgba(0, 0, 0, 0.8);
+  padding: 14px 18px 12px;
+  max-width: 780px;
+  width: 100%;
+}
+.overlaypanel.narrowpanel { max-width: 380px; }
+.overlaypanel.widepanel { max-width: 1040px; }
+
+.setrow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  padding: 6px 0;
+}
+.setrow button { min-width: 64px; }
+
+
+/* end-of-watch full watch log: scrolls inside its column */
+.endwatchlog {
+  max-height: 380px;
+  overflow-y: auto;
+  border: 1px solid rgba(255, 176, 0, 0.25);
+  padding: 6px 8px;
+}
+.endwatchlog pre { margin: 0 0 4px; white-space: pre-wrap; }
+
+
+/* AI arsenal seizure: the one log line that inverts to red */
+.logline.seize {
+  background: var(--red);
+  color: var(--amber);
+  padding: 0 3px;
+  margin: 1px 0;
+}
+.endwatchlog .seizeline {
+  background: var(--red);
+  color: var(--amber);
+  padding: 0 3px;
+}
+
+
+/* ——— the trophy shelf ——— */
+.badges {
+  border-collapse: collapse;
+  margin: 8px auto 0;
+  width: 96%;
+}
+.badges th, .badges td { text-align: center; padding: 3px 6px; }
+.badges thead th img {
+  width: 64px;
+  height: 64px;
+  image-rendering: auto; /* smoothed: dithered art at thumb scale reads as noise otherwise */
+  filter: grayscale(1) brightness(0.7);
+  opacity: 0.35;
+}
+.badges thead th.lit img { filter: none; opacity: 1; }
+.badges thead th div { font-size: 0.85em; color: var(--amber-dim); }
+.badges thead th.lit div { color: var(--amber); }
+.badges td.bart { text-align: left; min-width: 190px; }
+.badges td.bart img { height: 52px; image-rendering: auto; vertical-align: middle; margin-right: 10px; }
+.badges td.bart div { display: inline-block; font-size: 0.9em; vertical-align: middle; }
+.badges .bunknown { color: var(--amber-dim); font-size: 1.1em; }
+.badges td.on { color: var(--amber); font-size: 1.1em; text-shadow: 0 0 5px rgba(255, 176, 0, 0.5); }
+.badges td.off::after { content: '▯'; color: var(--amber-dim); opacity: 0.5; font-size: 1.1em; }
+.badges td.na { color: var(--amber-dim); opacity: 0.4; }
+
+
+/* badge best-rank line, commendations, scenario badge strip, button families */
+.badges thead th .brank { font-size: 0.62em; color: var(--amber-dim); min-height: 1em; }
+.commendrow {
+  display: flex;
+  justify-content: center;
+  gap: 18px;
+  flex-wrap: wrap;
+  margin: 6px 0 10px;
+}
+.commend { color: var(--amber-dim); opacity: 0.55; font-size: 0.85em; }
+.commend.on { color: var(--amber); opacity: 1; text-shadow: 0 0 5px rgba(255, 176, 0, 0.45); }
+.readinglist {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  max-width: 620px;
+  margin: 6px auto 10px;
+}
+.readingitem { color: var(--amber-dim); opacity: 0.4; font-size: 0.8em; letter-spacing: 0.02em; }
+.readingitem.on { color: var(--amber); opacity: 1; }
+
+.scenariobadges {
+  /* sits on the right, but its contents rag left under the label */
+  position: absolute;
+  right: 28px;
+  bottom: 64px;
+  text-align: left;
+  width: max-content;
+}
+.sblabel { color: var(--amber-dim); font-size: 0.7em; margin-bottom: 4px; }
+.sbrow { display: flex; gap: 6px; justify-content: flex-start; }
+.sbrow img {
+  width: 40px;
+  height: 40px;
+  image-rendering: pixelated;
+  opacity: 0.55;
+}
+.sbrow img.fresh {
+  opacity: 1;
+  filter: drop-shadow(0 0 7px rgba(255, 176, 0, 0.9));
+}
+
+.actions.row.nextshift { margin-top: 6px; }
+.actions.row.nextshift button { opacity: 0.85; }
+
+.sbcommend {
+  color: var(--amber);
+  font-size: 0.8em;
+  margin-top: 4px;
+  text-shadow: 0 0 6px rgba(255, 176, 0, 0.7);
+}
+
+
+/* NC3 national-ceiling cells: an invisible ▯ keeps the block font's exact
+   metrics (rows stay aligned); the dot is painted over its center. */
+.capcell { color: transparent; position: relative; }
+.capcell::after {
+  content: '·';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  color: var(--amber-dim);
+  opacity: 0.6;
+}
+
+
+/* the badge strip inline on the debrief (static, right-aligned) */
+.scenariobadges.inline { position: static; margin: 4px 0 2px; margin-left: auto; width: max-content; }
+
+
+/* ——— mobile: portrait & landscape. The bezel unfixes, the page scrolls,
+   rows wrap, and hover tooltips yield to the long-press card flip. ——— */
+/* Touch, at any size — iPads included. Hover tooltips are a mouse concept, so
+   the long-press card-flip replaces them. This is deliberately NOT tied to the
+   phone layout below: a tablet is a touch device with a desktop-sized screen,
+   and it wants the desk, not the stack. */
+@media (pointer: coarse) {
+  [data-tip]:hover::after { display: none !important; }
+  [data-tip] { -webkit-touch-callout: none; }
+}
+
+/* PHONE LAYOUT — narrow screens only.
+   This used to read `(max-width: 880px), (pointer: coarse)`, and that comma is
+   an OR: every touch device got the stacked phone layout no matter how wide it
+   was. iPads (820–1180px) were being handed a layout built for a 390px phone,
+   which is why everything looked spread out. Phone landscape is caught by the
+   height clause. */
+@media (max-width: 820px), (pointer: coarse) and (max-height: 520px) {
+  body { overflow: auto; }
+  .bezel {
+    position: static;
+    height: auto;
+    min-height: 100dvh;
+    padding: 6px;
+  }
+  .crt {
+    height: auto;
+    min-height: calc(100dvh - 12px);
+    padding: 8px 10px max(10px, env(safe-area-inset-bottom));
+  }
+  .screen, .screen.scrolly { overflow: visible; }
+  /* desk chrome overlaps content at phone widths */
+  .bezel-logo, .bezel-cal, .bezel-note { display: none; }
+  /* selection screen */
+  .optrow.row { flex-wrap: wrap; }
+  .optrow.row button { flex: 1 0 18%; }
+  .statgrid { grid-template-columns: repeat(2, 1fr); }
+  .briefhdr { flex-direction: column; }
+  .speedgrid { grid-template-columns: 1fr; }
+  .seedgrid { grid-template-columns: 1fr; }
+  /* strategic screen: columns stack, panel wraps two-up */
+  .cols { flex-direction: column; }
+  .watchlog { max-height: 30dvh; }
+  .actionbar { flex-wrap: wrap; }
+  .agroup { flex: 1 0 46%; }
+  .endcell { flex: 1 0 100%; }
+  .warning-grid { flex-direction: column; }
+  .actions.row { flex-wrap: wrap; }
+  .actions.row button { flex: 1 0 45%; }
+  .badges thead th img { width: 40px; height: 40px; }
+  .replayimg { max-height: none; }
+  .scenariobadges:not(.inline) { position: static; margin-top: 8px; margin-left: auto; width: max-content; }
+}
+
+/* TABLET — a touch screen with room. Keeps the desk layout; only the desk
+   chrome that would collide with the glass at these widths steps aside. */
+@media (pointer: coarse) and (min-width: 821px) and (max-width: 1180px) {
+  .bezel { padding: 10px clamp(20px, 4vw, 60px); }
+  .bezel-note, .bezel-cal { display: none; }   /* no room for them beside the glass */
+  .bezel-logo { width: clamp(40px, 4vw, 60px); top: 10px; left: 2px; }
+  .actions.row button, .act, .endyear { min-height: 44px; }  /* thumbs, not cursors */
+}
+
+/* the flipped card: the button becomes its own tooltip, expanding in place */
+button.tipflip {
+  white-space: pre-wrap !important;
+  height: auto !important;
+  text-align: left !important;
+  background: var(--amber) !important;
+  color: var(--bg) !important;
+  font-size: 0.82em;
+  line-height: 1.35;
+  padding: 8px 10px !important;
+  overflow: visible !important;
+}
+button:disabled.tipflip, button.inert.tipflip {
+  background: var(--amber-dim) !important;
+  color: var(--bg) !important;
+  opacity: 0.95;
+}
+
+
+/* the row that ended the game */
+table.debrief tr.fatalrow td { color: var(--hot); }
+
+/* the badges table is wider than a phone; let it scroll rather than crush */
+@media (max-width: 820px), (pointer: coarse) and (max-height: 520px) {
+  .badges { display: block; overflow-x: auto; width: 100%; }
+}
+
+
+/* the two clean exits: green in the logs */
+.logline.good {
+  background: var(--green);
+  color: var(--bg);
+  padding: 0 3px;
+  margin: 1px 0;
+}
+.endwatchlog .goodline {
+  background: var(--green);
+  color: var(--bg);
+  padding: 0 3px;
+}
+
+/* the other shelf: what the record holds against you */
+.commend.reprimand { color: var(--amber-dim); }
+.commend.reprimand.on { color: var(--hot); border-color: var(--hot); }
+.sbreprimand { color: var(--hot); font-size: 0.78em; letter-spacing: 0.08em; text-align: left; }
