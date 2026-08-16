@@ -609,7 +609,7 @@ export function App() {
     if (action === 'intercept') me().budget = Math.max(0, me().budget - iceptFireCost(me(), worldRef.current!))
     const seized = worldRef.current?.asi?.arsenalsHeld.includes(faction.id) ?? false
     const res: ResolutionEx = resolve(me(), ev, action, waitsUsed, seized, rngRef.current)
-    tlog('warn', { a: action, out: res.outcome, real: ev.isReal ? 1 : 0, y: worldRef.current?.year ?? -1 })
+    tlog('warn', { a: action, out: res.outcome, real: ev.isReal ? 1 : 0, conf: Math.round(ev.displayedConfidence * 100), y: worldRef.current?.year ?? -1 })
     // releaser, or the ghost you fired on — not a fixed nemesis.
     adversaryRef.current = ev.attackerName || ev.apparentAttacker || me().f.rival
     if (res.outcome === 'absorbed' || res.outcome === 'decapitated' || res.outcome === 'deadhand') {
