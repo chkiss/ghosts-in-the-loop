@@ -10,6 +10,11 @@ import {
 import { FACTIONS } from '../sim/factions.ts'
 import { WorldMap, arsenalLabel } from './WorldMap.tsx'
 
+// Touch users have no hover: the button descriptions are reached by pressing
+// and holding (see installTipFlip). Desktop users hover and need no prompt, so
+// the in-panel hint arms only on coarse pointers.
+const COARSE = typeof window !== 'undefined' && !!window.matchMedia?.('(pointer: coarse)').matches
+
 interface Props {
   w: WorldWithBelief
   p: PowerState
@@ -278,6 +283,7 @@ YOUR POSTURE THIS YEAR: ${w.playerPosture.toUpperCase()}`
       </div>
 
       <div className="panelhdr">CONTROL PANEL</div>
+      {COARSE && <div className="holdhint">PRESS &amp; HOLD ANY BUTTON TO READ WHAT IT DOES</div>}
       <div className="actionbar">
         {panels.map((g) => (
           <div key={g.title} className={`agroup${armedCol === g.title[0] ? ' armed' : ''}`}>

@@ -1138,7 +1138,7 @@ KEYS
   ?                 THIS MANUAL · ESC CLOSES
   Q Q               WALK OUT ON THE SHIFT (ERASES IT)
 
-EVERY READOUT HAS A HOVER TOOLTIP.${p.seedStr ? `\n\nTHIS SHIFT'S SEED: ${p.seedStr}` : ''}`}
+EVERY READOUT AND BUTTON EXPLAINS ITSELF: HOVER ON A MOUSE, OR PRESS AND HOLD ON A TOUCHSCREEN TO FLIP IT OVER AND READ WHAT IT DOES.${p.seedStr ? `\n\nTHIS SHIFT'S SEED: ${p.seedStr}` : ''}`}
         </pre>
         <div className="rule" />
         <pre className="dim">

@@ -248,6 +248,15 @@ pre { font-family: inherit; white-space: pre-wrap; }
   background: var(--amber-dim);
   flex: 1;
 }
+/* touch-only affordance under the control panel: on a coarse pointer the button
+   descriptions are reached by press-and-hold, which nothing else advertises */
+.holdhint {
+  text-align: center;
+  color: var(--amber-dim);
+  font-size: 0.72em;
+  letter-spacing: 0.14em;
+  margin: 3px 0 1px;
+}
 .actionbar {
   display: flex;
   gap: 16px;
