@@ -303,6 +303,9 @@ export function App() {
   // ——— setup ———
 
   const begin = () => {
+    // The one event that says a visitor actually started a game (and as whom):
+    // lets the dashboard tell real players from opens that never chose a chair.
+    tlog('begin', { f: faction.id, seed: seedStr })
     const rng = makeRng(seedFromString(`${seedStr}|${faction.id}`))
     rngRef.current = rng
     worldRef.current = newWorld(rng)
