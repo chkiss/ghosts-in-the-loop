@@ -303,8 +303,10 @@ export function App() {
   // ——— setup ———
 
   const begin = () => {
-    // The one event that says a visitor actually started a game (and as whom):
-    // lets the dashboard tell real players from opens that never chose a chair.
+    // The one event that says a visitor actually started a game (and as whom).
+    // 'end' can't stand in for it: almost no one reaches an ending, so an
+    // abandoned game would otherwise record no faction at all. No-op unless the
+    // optional telemetry module is present (see telemetry_runtime.ts).
     tlog('begin', { f: faction.id, seed: seedStr })
     const rng = makeRng(seedFromString(`${seedStr}|${faction.id}`))
     rngRef.current = rng
