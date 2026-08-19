@@ -1,0 +1,39 @@
+# Typecheck, build, and play the game.
+#
+# The harness is the only automated test this project has: it runs the same
+# year loop the UI runs, driven by player archetypes, and fails if any of the
+# fifteen endings has become unreachable or if any run threw. That is the
+# check worth guarding, because a rules change can silently strand an ending
+# without breaking a single type.
+#
+# Node 22.6+ is required by the harness, not by the game: the tools import
+# .ts modules directly and rely on Node's built-in type stripping.
+
+name: ci
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: npm
+
+      - run: npm ci
+
+      - name: Typecheck and build
+        run: npm run build
+
+      - name: Harness (balance sweep, ending coverage)
+        run: node tools/harness.mjs
+
+      - name: Briefing-screen layout regression
+        run: node tools/layout_test.mjs

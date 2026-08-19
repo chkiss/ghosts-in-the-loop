@@ -575,3 +575,9 @@ const seen = new Set(allRecs.map((r) => r.kind))
 const missing = ALL.filter((k) => !seen.has(k))
 console.log(`\nENDING COVERAGE: ${seen.size}/${ALL.length}` + (missing.length ? `  MISSING: ${missing.join(', ')}` : '  — all reachable'))
 if (totalCrashes) console.log(`!! ${totalCrashes} CRASHES`)
+
+// An ending nothing can reach, or a run that threw, is a failure and not a
+// remark: this is the only automated check the game has, so it has to be able
+// to go red. The gallery check above already sets exitCode the same way.
+if (missing.length) process.exitCode = 1
+if (totalCrashes) process.exitCode = 1

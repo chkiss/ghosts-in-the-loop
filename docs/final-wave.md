@@ -1,3 +1,17 @@
+# Final wave: the brief
+
+The last round of design work before release, written as instructions to
+myself. **Everything here shipped.** It is kept as design history rather than
+as a backlog: it shows what the game was missing a few weeks out and what the
+answers turned out to be. Third-party CPU-vs-CPU strikes, the intervene
+choice and its hero text, the UNSC as a real screen, replaying a seed,
+customers measured in billions against world population, and escalating
+interceptor and market-expansion costs are all in the shipped build.
+
+The original text follows, unedited.
+
+---
+
   Gameplay:
   - CPU countries can attack each other (vast majority should be rivals attacking each other); it should show a different countdown screen than the red one (amber screen?) where the target is clearly stated as not this country; player has the choice to intervene with conventional arms (which risk escalation esp. by regimes with bad NC3 or low NC3 control) or nuclear (same armageddon endgame) or to do nothing, which leaves the decision up to the victim country. They should decide to stand down almost always - based on historical close calls - and there should be a "hero text" describing a hero, using a real name
   - Balance: I've got max NC3 modernization but my radar still shows the same (wrong >50%) confidence level even after I deliberate. This shouldn't be the case.

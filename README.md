@@ -73,12 +73,22 @@ you only need these if you change a source image.
 | `src/data/` | Attacker tables, real historical close calls, coastline geometry. |
 | `src/ui/` | React screens: strategic board, warning modal, ending, dev gallery. |
 | `public/art/` | Dithered amber PNGs; the baked sticky notes. |
-| `SPEC.md` | The full design spec, and the argument the game is making. |
-| `ART_SPEC.md` | The amber/CRT visual rules. |
+| `tools/` | The harness and the art pipeline. |
+| `docs/` | Design and process documents, below. |
 
-`SPEC.md` still carries the working title, **Stone Age in 72**: from Jacobsen's
-figure for launch to global thermonuclear exchange, and LeMay's phrase. The game
-shipped as *Ghosts in the Loop*; the spec is otherwise current.
+### docs
+
+| Document | What it is |
+| --- | --- |
+| [`SPEC.md`](docs/SPEC.md) | The full design spec, and the argument the game is making. |
+| [`ART_SPEC.md`](docs/ART_SPEC.md) | The amber/CRT visual rules. |
+| [`final-wave.md`](docs/final-wave.md) | The brief for the last round of work before release. Everything in it shipped; kept as design history. |
+| [`refactor-baseline.md`](docs/refactor-baseline.md) | Before and after measurements from the July 2026 refactor: bundle size, build time, LOC. |
+
+[`SPEC.md`](docs/SPEC.md) still carries the working title, **Stone Age in 72**:
+from Jacobsen's figure for launch to global thermonuclear exchange, and LeMay's
+phrase. The game shipped as *Ghosts in the Loop*; the spec is otherwise
+current.
 
 ## A note on deployment
 

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Atkinson 1-bit dither → amber, per SPEC §11 / ART_SPEC.md.
+"""Atkinson 1-bit dither → amber, per docs/SPEC.md §11 and docs/ART_SPEC.md.
 
 Every source image runs the same pass: grayscale → contrast stretch →
 Atkinson error diffusion at target width → black stays transparent, white
