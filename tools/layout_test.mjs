@@ -50,14 +50,25 @@ const chrome = spawn(CHROME, [
   `--user-data-dir=${profile}`, '--remote-debugging-port=0', 'about:blank',
 ], { stdio: ['ignore', 'ignore', 'pipe'] })
 
-// read the chosen debug port from DevToolsActivePort
+// Keep chromium's stderr: without it, a launch failure reports only that no
+// port appeared, which is the same symptom for a missing library, a sandbox
+// refusal, and a cold runner that was simply too slow.
+let chromeErr = ''
+chrome.stderr.on('data', (d) => { chromeErr += d })
+
+// read the chosen debug port from DevToolsActivePort. 30s, not 10: a CI
+// runner launching chromium for the first time is well past 10 seconds.
 const portFile = join(profile, 'DevToolsActivePort')
 let wsBase = ''
-for (let i = 0; i < 100 && !wsBase; i++) {
+for (let i = 0; i < 300 && !wsBase; i++) {
   await new Promise((r) => setTimeout(r, 100))
   try { wsBase = `http://127.0.0.1:${readFileSync(portFile, 'utf8').split('\n')[0].trim()}` } catch {}
 }
-if (!wsBase) { console.error('LAYOUT: chromium did not open a debug port'); chrome.kill(); process.exit(2) }
+if (!wsBase) {
+  console.error(`LAYOUT: chromium (${CHROME}) did not open a debug port in 30s`)
+  if (chromeErr.trim()) console.error(chromeErr.trim().split('\n').slice(-8).join('\n'))
+  chrome.kill(); process.exit(2)
+}
 
 const tab = await (await fetch(wsBase + '/json/new?' + encodeURIComponent('about:blank'), { method: 'PUT' })).json()
 const ws = new WebSocket(tab.webSocketDebuggerUrl)
