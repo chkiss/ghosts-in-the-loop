@@ -1,17 +1,17 @@
 # Ghosts in the Loop
 
-A browser strategy game about nuclear deterrence in the age of advanced AI.
-
-**▶ Play it at [ghostsintheloop.com](https://ghostsintheloop.com)** — no install,
-no account, runs in the browser. The rest of this file is for reading the code.
+A browser strategy game about nuclear deterrence in the age of advanced AI. You
+can just play it at [ghostsintheloop.com](https://ghostsintheloop.com/): no
+install, no account, nothing to sign up for. This repo is here for anyone who
+wants to read the code, check the sources, or run the balance harness.
 
 Twenty years on nuclear watch. You take one of nine nuclear powers; the rest are
-bots. You don't command — you *process*, behind glass, in a building you can't
+bots. You don't command: you *process*, behind glass, in a building you can't
 leave. Every year you spend a budget, sit a council, and read whatever the
 warning system decides to show you. Sometimes it is wrong.
 
 The design is a trap, and it is meant to be. Every turn, the locally-optimal
-move is to buy the things that feel like power — targeting, missile defense, AI
+move is to buy the things that feel like power: targeting, missile defense, AI
 woven into your command loop. Those work, modestly. They also push the tracks
 that actually end runs. A player with good wargame instincts should lose, and
 the post-game screen should show them exactly which assumption broke, and when.
@@ -39,8 +39,8 @@ clean clone builds as-is.
 ## Testing
 
 The game has no UI test suite. It has a headless harness that plays the exact
-same year loop the UI plays — spend → advance → vote/crisis → strike roll →
-warning → resolve → retaliate/hold → cascade — driven by player archetypes
+same year loop the UI plays: spend → advance → vote/crisis → strike roll →
+warning → resolve → retaliate/hold → cascade, driven by player archetypes
 rather than a human. Adversarial archetypes are there to break things, not to
 win.
 
@@ -61,7 +61,7 @@ anything in `src/rules/`.
 `tools/dither.py` and `tools/pngpack.py` regenerate the art (Atkinson 1-bit
 dither → amber, then repacked as 1-bit paletted PNG); `tools/notebake.py` bakes
 the sticky notes from language-native handwriting fonts, so players never wait
-on a Nastaliq webfont to read two words. Committed art is already processed —
+on a Nastaliq webfont to read two words. Committed art is already processed:
 you only need these if you change a source image.
 
 ## Layout
@@ -71,12 +71,12 @@ you only need these if you change a source image.
 | `src/rules/` | The simulation. World state, warnings, cascade, council, endings, assigned readings. |
 | `src/sim/` | The nine factions and the seeded RNG. |
 | `src/data/` | Attacker tables, real historical close calls, coastline geometry. |
-| `src/ui/` | React screens — strategic board, warning modal, ending, dev gallery. |
+| `src/ui/` | React screens: strategic board, warning modal, ending, dev gallery. |
 | `public/art/` | Dithered amber PNGs; the baked sticky notes. |
 | `SPEC.md` | The full design spec, and the argument the game is making. |
 | `ART_SPEC.md` | The amber/CRT visual rules. |
 
-`SPEC.md` still carries the working title, **Stone Age in 72** — from Jacobsen's
+`SPEC.md` still carries the working title, **Stone Age in 72**: from Jacobsen's
 figure for launch to global thermonuclear exchange, and LeMay's phrase. The game
 shipped as *Ghosts in the Loop*; the spec is otherwise current.
 
@@ -86,12 +86,12 @@ This repo is the game, not the deployment. The scripts that publish it to a
 live host are deliberately not committed, and `index.html` carries an
 `__OG_BASE__` placeholder in its `og:url` and `og:image` tags that a deploy step
 is expected to rewrite to an absolute origin. If you deploy your own copy,
-substitute it — a built `dist/index.html` will otherwise ship the literal
+substitute it: a built `dist/index.html` will otherwise ship the literal
 placeholder, which harms nothing but makes for a broken link preview.
 
 ## License
 
-The **code** is [GPL-3.0](LICENSE). Fork it, learn from it, build on it — a
+The **code** is [GPL-3.0](LICENSE). Fork it, learn from it, build on it: a
 distributed derivative has to stay open too.
 
 The **content is not**: the prose, the art, the ending text, the incident deck,
@@ -100,6 +100,6 @@ reserved. The GPL is a software license and was never meant to cover writing.
 If you want to reuse the writing or the artwork, ask.
 
 Bundled third-party fonts under `tools/fonts/` keep their own licenses (SIL OFL
-1.1, and Apache-2.0 for one) — see
+1.1, and Apache-2.0 for one). See
 [`tools/fonts/LICENSES.md`](tools/fonts/LICENSES.md). They are build-time assets
 and are never served to a player.
